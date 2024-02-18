@@ -113,37 +113,26 @@ SK_CreateDLLHook2 ( const wchar_t  *pwszModule, const char  *pszProcName,
   HMODULE hMod = nullptr;
 
   // Hook the XInput DLL in System32, not ourself!
-  if ( StrStrIW (pwszModule, L"XInput1_4") ||
-               (! GetModuleHandleExW ( GET_MODULE_HANDLE_EX_FLAG_PIN,
-                                       pwszModule,
-                                         &hMod )
-               )
-     )
+  if (StrStrIW (pwszModule, L"XInput1_4") || (! GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN, pwszModule, &hMod)))
   {
     hMod =
-      LoadLibraryExW ( pwszModule,
-        nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 |
-                 LOAD_LIBRARY_SAFE_CURRENT_DIRS
-      );
+      LoadLibraryExW (pwszModule, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32|LOAD_LIBRARY_SAFE_CURRENT_DIRS);
 
     if (hMod != 0)
-    {
       GetModuleHandleExW ( GET_MODULE_HANDLE_EX_FLAG_PIN |
-                  GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-           (wchar_t *)hMod,
-                     &hMod
-      );
-    }
+                           GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (wchar_t *)hMod, &hMod );
   }
 
   void      *pFuncAddr = nullptr;
-  MH_STATUS  status    = MH_ERROR_MODULE_NOT_FOUND;
+  MH_STATUS  status    = MH_OK;
 
-  if (hMod != nullptr)
+  if (hMod == nullptr)
+    status = MH_ERROR_MODULE_NOT_FOUND;
+
+  else
   {
     pFuncAddr =
-      GetProcAddress ( hMod,
-                         pszProcName );
+      GetProcAddress (hMod, pszProcName);
 
     status =
       MH_CreateHook ( pFuncAddr,
@@ -151,38 +140,41 @@ SK_CreateDLLHook2 ( const wchar_t  *pwszModule, const char  *pszProcName,
                           ppOriginal );
   }
 
-  if (MH_ERROR_ALREADY_CREATED == status)
+
+  if (status != MH_OK)
   {
-    if ( nullptr  ==  ppOriginal )
-    { 
-      SH_Introspect ( pFuncAddr, SH_TRAMPOLINE,
-                      ppOriginal );
-      return
-        MH_ERROR_ALREADY_CREATED;
-    }
-
-    status = 
-      MH_RemoveHook (pFuncAddr);
-
-    if (status == MH_OK)
+    if (status == MH_ERROR_ALREADY_CREATED)
     {
-      return
-        SK_CreateDLLHook2 ( pwszModule, pszProcName,
-                               pDetour,  ppOriginal,
-                                         ppFuncAddr );
+      if (ppOriginal == nullptr)
+      {
+        SH_Introspect ( pFuncAddr,
+                          SH_TRAMPOLINE,
+                            ppOriginal );
+
+        return status;
+      }
+
+      else if (MH_OK == (status = MH_RemoveHook (pFuncAddr)))
+      {
+        return SK_CreateDLLHook2 (pwszModule, pszProcName, pDetour, ppOriginal, ppFuncAddr);
+      }
     }
+
+    if (ppFuncAddr != nullptr)
+       *ppFuncAddr  = nullptr;
   }
 
-  if (ppFuncAddr != nullptr)
-     *ppFuncAddr  = nullptr;
+  else
+  {
+    if (ppFuncAddr != nullptr)
+       *ppFuncAddr  = pFuncAddr;
 
-  if ( ppFuncAddr != nullptr && status == MH_OK )
-  {   *ppFuncAddr  =    pFuncAddr;
-    MH_QueueEnableHook (pFuncAddr); 
+    MH_QueueEnableHook (pFuncAddr);
   }
 
   return status;
 }
+
 
 typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
 typedef NTSTATUS *PNTSTATUS;
@@ -195,9 +187,9 @@ NTSTATUS
 WINAPI
 SK_NtLdr_LockLoaderLock (ULONG Flags, ULONG* State, ULONG_PTR* Cookie)
 {
-  // The lock must not be acquired until DllMain (...) returns!
-  if (ReadAcquire (&__VP_DLL_Refs) < 1)
-    return STATUS_SUCCESS; // No-Op
+  //// The lock must not be acquired until DllMain (...) returns!
+  //if (ReadAcquire (&__VP_DLL_Refs) < 1)
+  //  return STATUS_SUCCESS; // No-Op
 
   static LdrLockLoaderLock_pfn LdrLockLoaderLock =
         (LdrLockLoaderLock_pfn)GetProcAddress (GetModuleHandleW (L"NtDll.dll"),
@@ -225,13 +217,13 @@ SK_NtLdr_UnlockLoaderLock (ULONG Flags, ULONG_PTR Cookie)
   NTSTATUS UnlockLoaderStatus =
     LdrUnlockLoaderLock (Flags, Cookie);
 
-  // Check for Loader Unlock Failure...
-  if (ReadAcquire (&__VP_DLL_Refs) >= 1 && Cookie != 0)
-  {
-#ifdef DEBUG
-    assert (UnlockLoaderStatus == STATUS_SUCCESS);
-#endif
-  }
+//  // Check for Loader Unlock Failure...
+//  if (ReadAcquire (&__VP_DLL_Refs) >= 1 && Cookie != 0)
+//  {
+//#ifdef DEBUG
+//    assert (UnlockLoaderStatus == STATUS_SUCCESS);
+//#endif
+//  }
 
   return
     UnlockLoaderStatus;
