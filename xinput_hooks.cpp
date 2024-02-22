@@ -15,14 +15,21 @@ XInputGetState (DWORD dwUserIndex, XINPUT_STATE *pState)
       ERROR_NOT_CONNECTED;
   }
 
+  DWORD dwState;
+
   static XInputGetState_pfn _XInputGetState =
         (XInputGetState_pfn)GetProcAddress (
           LoadLibraryExW ( config.wszPathToSystemXInput1_4,
                   nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 |
                            LOAD_LIBRARY_SAFE_CURRENT_DIRS ), "XInputGetState" );
 
-  return
+  dwState =
     _XInputGetState (dwUserIndex, pState);
+
+  if (dwState != ERROR_SUCCESS)
+    return ERROR_SUCCESS;
+
+  return dwState;
 }
 
 DWORD
@@ -61,8 +68,13 @@ XInputSetState (
           LoadLibraryExW ( config.wszPathToSystemXInput1_4, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32|LOAD_LIBRARY_SAFE_CURRENT_DIRS),
                             "XInputSetState" );
 
-  return
+  DWORD dwState =
     _XInputSetState (dwUserIndex, pVibration);
+
+  if (dwState != ERROR_SUCCESS)
+    return ERROR_SUCCESS;
+
+  return dwState;
 }
 
 DWORD

@@ -1,10 +1,16 @@
+
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
 #include "config.h"
 #include <cassert>
 
 #pragma comment (lib, "shlwapi.lib")
+
+#ifdef _M_IX86
 #pragma comment (lib, "SKinHook/libMinHook.lib")
+#else
+#pragma comment (lib, "SKinHook/libMinHook64.lib")
+#endif
 
 static CreateFileA_pfn CreateFileA_Original = nullptr;
 static CreateFileW_pfn CreateFileW_Original = nullptr;
@@ -229,23 +235,268 @@ SK_NtLdr_UnlockLoaderLock (ULONG Flags, ULONG_PTR Cookie)
     UnlockLoaderStatus;
 }
 
-static XInputGetState_pfn   XInputGetState1_4_Original   = nullptr;
-static XInputGetStateEx_pfn XInputGetStateEx1_4_Original = nullptr;
+static XInputGetState_pfn          XInputGetState1_4_Original          = nullptr;
+static XInputGetStateEx_pfn        XInputGetStateEx1_4_Original        = nullptr;
+static XInputGetState_pfn          XInputGetState1_3_Original          = nullptr;
+static XInputGetStateEx_pfn        XInputGetStateEx1_3_Original        = nullptr;
+static XInputGetState_pfn          XInputGetState9_1_0_Original        = nullptr;
+static XInputGetStateEx_pfn        XInputGetStateEx9_1_0_Original      = nullptr;
+static XInputGetState_pfn          XInputGetState1_2_Original          = nullptr;
+static XInputGetStateEx_pfn        XInputGetStateEx1_2_Original        = nullptr;
+static XInputGetState_pfn          XInputGetState1_1_Original          = nullptr;
+static XInputGetStateEx_pfn        XInputGetStateEx1_1_Original        = nullptr;
+static XInputGetCapabilities_pfn   XInputGetCapabilities1_4_Original   = nullptr;
+static XInputGetCapabilitiesEx_pfn XInputGetCapabilitiesEx1_4_Original = nullptr;
+static XInputGetCapabilities_pfn   XInputGetCapabilities1_3_Original   = nullptr;
+static XInputGetCapabilitiesEx_pfn XInputGetCapabilitiesEx1_3_Original = nullptr;
+static XInputGetCapabilities_pfn   XInputGetCapabilities1_2_Original   = nullptr;
+static XInputGetCapabilities_pfn   XInputGetCapabilities1_1_Original   = nullptr;
+static XInputGetCapabilities_pfn   XInputGetCapabilities9_1_0_Original = nullptr;
+
+//#define FAKE_SUCCESS
 
 DWORD
 WINAPI
 XInputGetState1_4_Detour (DWORD dwUserIndex, XINPUT_STATE *pState)
 {
+#ifndef FAKE_SUCCESS
   return
     ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
 }
 
 DWORD
 WINAPI
 XInputGetStateEx1_4_Detour (DWORD dwUserIndex, XINPUT_STATE_EX *pState)
 {
+#ifndef FAKE_SUCCESS
   return
     ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetCapabilities1_4_Detour (
+  _In_  DWORD                dwUserIndex,
+  _In_  DWORD                dwFlags,
+  _Out_ XINPUT_CAPABILITIES *pCapabilities )
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetCapabilitiesEx1_4_Detour (
+  _In_  DWORD                   dwReserved,
+  _In_  DWORD                   dwUserIndex,
+  _In_  DWORD                   dwFlags,
+  _Out_ XINPUT_CAPABILITIES_EX *pCapabilitiesEx )
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetState1_3_Detour (DWORD dwUserIndex, XINPUT_STATE *pState)
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetStateEx1_3_Detour (DWORD dwUserIndex, XINPUT_STATE_EX *pState)
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetCapabilities1_3_Detour (
+  _In_  DWORD                dwUserIndex,
+  _In_  DWORD                dwFlags,
+  _Out_ XINPUT_CAPABILITIES *pCapabilities )
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetCapabilitiesEx1_3_Detour (
+  _In_  DWORD                   dwReserved,
+  _In_  DWORD                   dwUserIndex,
+  _In_  DWORD                   dwFlags,
+  _Out_ XINPUT_CAPABILITIES_EX *pCapabilitiesEx )
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetState1_2_Detour (DWORD dwUserIndex, XINPUT_STATE *pState)
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetStateEx1_2_Detour (DWORD dwUserIndex, XINPUT_STATE_EX *pState)
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetCapabilities1_2_Detour (
+  _In_  DWORD                dwUserIndex,
+  _In_  DWORD                dwFlags,
+  _Out_ XINPUT_CAPABILITIES *pCapabilities )
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetState1_1_Detour (DWORD dwUserIndex, XINPUT_STATE *pState)
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetStateEx1_1_Detour (DWORD dwUserIndex, XINPUT_STATE_EX *pState)
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetCapabilities1_1_Detour (
+  _In_  DWORD                dwUserIndex,
+  _In_  DWORD                dwFlags,
+  _Out_ XINPUT_CAPABILITIES *pCapabilities )
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetState9_1_0_Detour (DWORD dwUserIndex, XINPUT_STATE *pState)
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetStateEx9_1_0_Detour (DWORD dwUserIndex, XINPUT_STATE_EX *pState)
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
+}
+
+DWORD
+WINAPI
+XInputGetCapabilities9_1_0_Detour (
+  _In_  DWORD                dwUserIndex,
+  _In_  DWORD                dwFlags,
+  _Out_ XINPUT_CAPABILITIES *pCapabilities )
+{
+#ifndef FAKE_SUCCESS
+  return
+    ERROR_NOT_CONNECTED;
+#else
+  return
+    ERROR_SUCCESS;
+#endif
 }
 
 
@@ -280,6 +531,81 @@ ValvePlug_InitThread (LPVOID)
                           XInputGetStateEx1_4_Detour,
                (void **)(&XInputGetStateEx1_4_Original), nullptr );
 
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
+                         "XInputGetCapabilities",
+                          XInputGetCapabilities1_4_Detour,
+               (void **)(&XInputGetCapabilities1_4_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
+                          XINPUT_GETCAPABILITIES_EX_ORDINAL,
+                          XInputGetCapabilitiesEx1_4_Detour,
+               (void **)(&XInputGetCapabilitiesEx1_4_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
+                         "XInputGetState",
+                          XInputGetState1_3_Detour,
+               (void **)(&XInputGetState1_3_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
+                          XINPUT_GETSTATEEX_ORDINAL,
+                          XInputGetStateEx1_3_Detour,
+               (void **)(&XInputGetStateEx1_3_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
+                         "XInputGetCapabilities",
+                          XInputGetCapabilities1_3_Detour,
+               (void **)(&XInputGetCapabilities1_3_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
+                          XINPUT_GETCAPABILITIES_EX_ORDINAL,
+                          XInputGetCapabilitiesEx1_3_Detour,
+               (void **)(&XInputGetCapabilitiesEx1_3_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
+                         "XInputGetState",
+                          XInputGetState1_2_Detour,
+               (void **)(&XInputGetState1_2_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
+                          XINPUT_GETSTATEEX_ORDINAL,
+                          XInputGetStateEx1_2_Detour,
+               (void **)(&XInputGetStateEx1_2_Original), nullptr );
+    
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
+                         "XInputGetCapabilities",
+                          XInputGetCapabilities1_2_Detour,
+               (void **)(&XInputGetCapabilities1_2_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
+                         "XInputGetState",
+                          XInputGetState1_1_Detour,
+               (void **)(&XInputGetState1_1_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
+                          XINPUT_GETSTATEEX_ORDINAL,
+                          XInputGetStateEx1_1_Detour,
+               (void **)(&XInputGetStateEx1_1_Original), nullptr );
+    
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
+                         "XInputGetCapabilities",
+                          XInputGetCapabilities1_1_Detour,
+               (void **)(&XInputGetCapabilities1_1_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
+                         "XInputGetState",
+                          XInputGetState9_1_0_Detour,
+               (void **)(&XInputGetState9_1_0_Original), nullptr );
+
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
+                          XINPUT_GETSTATEEX_ORDINAL,
+                          XInputGetStateEx9_1_0_Detour,
+               (void **)(&XInputGetStateEx9_1_0_Original), nullptr );
+    
+    SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
+                         "XInputGetCapabilities",
+                          XInputGetCapabilities9_1_0_Detour,
+               (void **)(&XInputGetCapabilities9_1_0_Original), nullptr );
+
     MH_ApplyQueued ();
   }
 
@@ -299,11 +625,17 @@ DllMain ( HMODULE hModule,
       InterlockedIncrement (&__VP_DLL_Refs);
 
 #ifdef _M_IX86
-      GetSystemWow64DirectoryW (config.wszPathToSystemXInput1_4, MAX_PATH);
+      GetSystemWow64DirectoryW (config.wszPathToSystemXInput1_4,   MAX_PATH);
+      GetSystemWow64DirectoryW (config.wszPathToSystemXInput1_3,   MAX_PATH);
+      GetSystemWow64DirectoryW (config.wszPathToSystemXInput9_1_0, MAX_PATH);
 #else
-      GetSystemDirectoryW      (config.wszPathToSystemXInput1_4, MAX_PATH);
+      GetSystemDirectoryW      (config.wszPathToSystemXInput1_4,   MAX_PATH);
+      GetSystemDirectoryW      (config.wszPathToSystemXInput1_3,   MAX_PATH);
+      GetSystemDirectoryW      (config.wszPathToSystemXInput9_1_0, MAX_PATH);
 #endif
-      PathAppendW              (config.wszPathToSystemXInput1_4, L"XInput1_4.dll");
+      PathAppendW              (config.wszPathToSystemXInput1_4,   L"XInput1_4.dll");
+      PathAppendW              (config.wszPathToSystemXInput1_3,   L"XInput1_3.dll");
+      PathAppendW              (config.wszPathToSystemXInput9_1_0, L"XInput9_1_0.dll");
 
                     CRegKey hkValvePlug;
       if ( ERROR_SUCCESS == hkValvePlug.Open (
@@ -314,6 +646,14 @@ DllMain ( HMODULE hModule,
                  L"FillTheSwamp",
           config.dwFillTheSwamp
         );
+      }
+
+      wchar_t                      wszModuleName [MAX_PATH] = { };
+      GetModuleFileNameW (hModule, wszModuleName, MAX_PATH);
+
+      if (! StrStrIW (wszModuleName, L"XInput1_4"))
+      {
+        config.dwFillTheSwamp = false;
       }
 
       if (config.dwFillTheSwamp != 0x0)
