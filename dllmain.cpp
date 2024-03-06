@@ -12,6 +12,9 @@
 #pragma comment (lib, "SKinHook/libMinHook64.lib")
 #endif
 
+         config_s config;
+volatile LONG     __VP_DLL_Refs = 0UL;
+
 static CreateFileA_pfn CreateFileA_Original = nullptr;
 static CreateFileW_pfn CreateFileW_Original = nullptr;
 static CreateFile2_pfn CreateFile2_Original = nullptr;
@@ -624,17 +627,25 @@ DllMain ( HMODULE hModule,
     {
       InterlockedIncrement (&__VP_DLL_Refs);
 
+      config = { };
+
 #ifdef _M_IX86
       GetSystemWow64DirectoryW (config.wszPathToSystemXInput1_4,   MAX_PATH);
       GetSystemWow64DirectoryW (config.wszPathToSystemXInput1_3,   MAX_PATH);
+      GetSystemWow64DirectoryW (config.wszPathToSystemXInput1_2,   MAX_PATH);
+      GetSystemWow64DirectoryW (config.wszPathToSystemXInput1_1,   MAX_PATH);
       GetSystemWow64DirectoryW (config.wszPathToSystemXInput9_1_0, MAX_PATH);
 #else
       GetSystemDirectoryW      (config.wszPathToSystemXInput1_4,   MAX_PATH);
       GetSystemDirectoryW      (config.wszPathToSystemXInput1_3,   MAX_PATH);
+      GetSystemDirectoryW      (config.wszPathToSystemXInput1_2,   MAX_PATH);
+      GetSystemDirectoryW      (config.wszPathToSystemXInput1_1,   MAX_PATH);
       GetSystemDirectoryW      (config.wszPathToSystemXInput9_1_0, MAX_PATH);
 #endif
       PathAppendW              (config.wszPathToSystemXInput1_4,   L"XInput1_4.dll");
       PathAppendW              (config.wszPathToSystemXInput1_3,   L"XInput1_3.dll");
+      PathAppendW              (config.wszPathToSystemXInput1_2,   L"XInput1_2.dll");
+      PathAppendW              (config.wszPathToSystemXInput1_1,   L"XInput1_1.dll");
       PathAppendW              (config.wszPathToSystemXInput9_1_0, L"XInput9_1_0.dll");
 
                     CRegKey hkValvePlug;
