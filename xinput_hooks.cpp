@@ -3,7 +3,7 @@
 #include "config.h"
 
 using XInputGetDSoundAudioDeviceGuids_pfn = DWORD (WINAPI *)(DWORD,GUID*,GUID*);
-using XInputGetAudioDeviceIds_pfn = DWORD (WINAPI *)(DWORD,LPWSTR,UINT*,LPWSTR,UINT*);
+using XInputGetAudioDeviceIds_pfn         = DWORD (WINAPI *)(DWORD,LPWSTR,UINT*,LPWSTR,UINT*);
 
 DWORD
 WINAPI
@@ -44,8 +44,10 @@ XInputGetStateEx (DWORD dwUserIndex, XINPUT_STATE_EX *pState)
 
   static XInputGetStateEx_pfn _XInputGetStateEx =
         (XInputGetStateEx_pfn)GetProcAddress (
-          LoadLibraryExW ( config.wszPathToSystemXInput1_4, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32|LOAD_LIBRARY_SAFE_CURRENT_DIRS),
-                            XINPUT_GETSTATEEX_ORDINAL );
+          LoadLibraryExW ( config.wszPathToSystemXInput1_4,
+                  nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 |
+                           LOAD_LIBRARY_SAFE_CURRENT_DIRS ),
+                           XINPUT_GETSTATEEX_ORDINAL );
 
   return
     _XInputGetStateEx (dwUserIndex, pState);
@@ -65,7 +67,9 @@ XInputSetState (
 
   static XInputSetState_pfn _XInputSetState =
         (XInputSetState_pfn)GetProcAddress (
-          LoadLibraryExW ( config.wszPathToSystemXInput1_4, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32|LOAD_LIBRARY_SAFE_CURRENT_DIRS),
+          LoadLibraryExW ( config.wszPathToSystemXInput1_4,
+                  nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 |
+                           LOAD_LIBRARY_SAFE_CURRENT_DIRS ),
                             "XInputSetState" );
 
   DWORD dwState =
@@ -92,8 +96,10 @@ XInputGetCapabilities (
 
   static XInputGetCapabilities_pfn _XInputGetCapabilities =
         (XInputGetCapabilities_pfn)GetProcAddress (
-          LoadLibraryExW ( config.wszPathToSystemXInput1_4, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32|LOAD_LIBRARY_SAFE_CURRENT_DIRS),
-                            "XInputGetCapabilities" );
+          LoadLibraryExW ( config.wszPathToSystemXInput1_4,
+                  nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 |
+                           LOAD_LIBRARY_SAFE_CURRENT_DIRS ),
+                                   "XInputGetCapabilities" );
 
   return
     _XInputGetCapabilities (dwUserIndex, dwFlags, pCapabilities);
@@ -115,8 +121,9 @@ XInputGetCapabilitiesEx (
 
   static XInputGetCapabilitiesEx_pfn _XInputGetCapabilitiesEx =
         (XInputGetCapabilitiesEx_pfn)GetProcAddress (
-          LoadLibraryExW ( config.wszPathToSystemXInput1_4, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32|LOAD_LIBRARY_SAFE_CURRENT_DIRS),
-                            XINPUT_GETCAPABILITIES_EX_ORDINAL );
+          LoadLibraryExW ( config.wszPathToSystemXInput1_4,
+                  nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 | LOAD_LIBRARY_SAFE_CURRENT_DIRS ),
+                           XINPUT_GETCAPABILITIES_EX_ORDINAL );
 
   return
     _XInputGetCapabilitiesEx (dwReserved, dwUserIndex, dwFlags, pCapabilitiesEx);
@@ -137,7 +144,9 @@ XInputGetBatteryInformation (
 
   static XInputGetBatteryInformation_pfn _XInputGetBatteryInformation =
         (XInputGetBatteryInformation_pfn)GetProcAddress (
-          LoadLibraryExW ( config.wszPathToSystemXInput1_4, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32|LOAD_LIBRARY_SAFE_CURRENT_DIRS),
+          LoadLibraryExW ( config.wszPathToSystemXInput1_4,
+            nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 | 
+                     LOAD_LIBRARY_SAFE_CURRENT_DIRS ),
                             "XInputGetBatteryInformation" );
 
   return
@@ -187,7 +196,7 @@ XInputGetAudioDeviceIds (
         (XInputGetAudioDeviceIds_pfn)GetProcAddress (
           LoadLibraryExW ( config.wszPathToSystemXInput1_4,
                   nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 |
-                           LOAD_LIBRARY_SAFE_CURRENT_DIRS),
+                           LOAD_LIBRARY_SAFE_CURRENT_DIRS ),
                                                 "XInputGetAudioDeviceIds");
 
   return
@@ -209,7 +218,9 @@ XInputGetDSoundAudioDeviceGuids (
 
   static XInputGetDSoundAudioDeviceGuids_pfn _XInputGetDSoundAudioDeviceGuids =
         (XInputGetDSoundAudioDeviceGuids_pfn)GetProcAddress (
-          LoadLibraryExW ( config.wszPathToSystemXInput1_4, nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32|LOAD_LIBRARY_SAFE_CURRENT_DIRS),
+          LoadLibraryExW ( config.wszPathToSystemXInput1_4,
+                  nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 |
+                           LOAD_LIBRARY_SAFE_CURRENT_DIRS ),
                             "XInputGetDSoundAudioDeviceGuids" );
 
   return
