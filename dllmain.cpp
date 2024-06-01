@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "config.h"
 #include <cassert>
+#include <string>
 
 #pragma comment (lib, "shlwapi.lib")
 
@@ -14,6 +15,48 @@
 
          config_s config;
 volatile LONG     __VP_DLL_Refs = 0UL;
+
+using GetCommandLineW_pfn = LPWSTR (WINAPI *)(void);
+using GetCommandLineA_pfn = LPSTR  (WINAPI *)(void);
+
+GetCommandLineW_pfn GetCommandLineW_Original = nullptr;
+GetCommandLineA_pfn GetCommandLineA_Original = nullptr;
+
+LPWSTR
+WINAPI
+GetCommandLineW_Detour (void)
+{
+  static std::wstring cmd_line;
+
+  if (cmd_line.empty ())
+  {
+    cmd_line =
+      GetCommandLineW_Original ();
+
+    cmd_line += L" -nojoy";
+  }
+
+  return (wchar_t *)cmd_line.c_str ();
+}
+
+LPSTR
+WINAPI
+GetCommandLineA_Detour (void)
+{
+  static std::string cmd_line;
+
+  if (cmd_line.empty ())
+  {
+    cmd_line =
+      GetCommandLineA_Original ();
+
+    cmd_line += " -nojoy";
+  }
+
+  return (char *)cmd_line.c_str ();
+}
+
+using GetCommandLineA_pfn = LPSTR  (WINAPI *)(void);
 
 static CreateFileA_pfn CreateFileA_Original = nullptr;
 static CreateFileW_pfn CreateFileW_Original = nullptr;
@@ -608,6 +651,16 @@ ValvePlug_InitThread (LPVOID)
                          "XInputGetCapabilities",
                           XInputGetCapabilities9_1_0_Detour,
                (void **)(&XInputGetCapabilities9_1_0_Original), nullptr );
+
+    SK_CreateDLLHook2 ( L"kernel32.dll",
+                         "GetCommandLineW",
+                          GetCommandLineW_Detour,
+               (void **)(&GetCommandLineW_Original), nullptr );
+
+    SK_CreateDLLHook2 ( L"kernel32.dll",
+                         "GetCommandLineA",
+                          GetCommandLineA_Detour,
+               (void **)(&GetCommandLineA_Original), nullptr );
 
     MH_ApplyQueued ();
   }
