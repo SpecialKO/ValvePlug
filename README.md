@@ -76,3 +76,11 @@ This is a (32-bit DWORD):
 
  * 0x0 = Steam Input is Allowed
  * 0x1 = Steam Input is Disallowed&nbsp;&nbsp;&nbsp;&nbsp;**(Default)**
+
+<br>
+<hr>
+<br>
+
+# Archival of Repository
+The repository has been archived as of July 2025 because Kaldaien was so fed up with Valve that he deleted his account and can no longer offer reasonable support for this project.
+If you are a frustrated developer dealing with Steam Input bugs, Valve does not care, but you may be able to reach out on Special K's Discord server for technical details on defeating Steam Input.
