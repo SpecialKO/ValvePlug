@@ -68,16 +68,27 @@ CreateFileA_Detour (LPCSTR                lpFileName,
 {
   if (StrStrIA (lpFileName, R"(\\?\hid)") != nullptr)
   {
-    SetLastError (ERROR_NO_SUCH_DEVICE);
+    if (config.dwFillTheSwamp != 0x0)
+    {
+      SetLastError (ERROR_NO_SUCH_DEVICE);
 
-    return INVALID_HANDLE_VALUE;
+      return INVALID_HANDLE_VALUE;
+    }
+
+    else
+    {
+      dwShareMode = (FILE_SHARE_READ | FILE_SHARE_WRITE);
+    }
   }
 
   if (StrStrIA (lpFileName, R"(\\.\pipe)") != nullptr)
   {
-    SetLastError (ERROR_NO_SUCH_DEVICE);
+    if (config.dwFillTheSwamp != 0x0)
+    {
+      SetLastError (ERROR_NO_SUCH_DEVICE);
 
-    return INVALID_HANDLE_VALUE;
+      return INVALID_HANDLE_VALUE;
+    }
   }
 
   return
@@ -99,16 +110,27 @@ CreateFile2_Detour (
 {
   if (StrStrIW (lpFileName, LR"(\\?\hid)") != nullptr)
   {
-    SetLastError (ERROR_NO_SUCH_DEVICE);
+    if (config.dwFillTheSwamp != 0x0)
+    {
+      SetLastError (ERROR_NO_SUCH_DEVICE);
 
-    return INVALID_HANDLE_VALUE;
+      return INVALID_HANDLE_VALUE;
+    }
+
+    else
+    {
+      dwShareMode = (FILE_SHARE_READ | FILE_SHARE_WRITE);
+    }
   }
 
   if (StrStrIW (lpFileName, LR"(\\.\pipe)") != nullptr)
   {
-    SetLastError (ERROR_NO_SUCH_DEVICE);
+    if (config.dwFillTheSwamp != 0x0)
+    {
+      SetLastError (ERROR_NO_SUCH_DEVICE);
 
-    return INVALID_HANDLE_VALUE;
+      return INVALID_HANDLE_VALUE;
+    }
   }
 
   return
@@ -130,16 +152,27 @@ CreateFileW_Detour ( LPCWSTR               lpFileName,
 {
   if (StrStrIW (lpFileName, LR"(\\?\hid)") != nullptr)
   {
-    SetLastError (ERROR_NO_SUCH_DEVICE);
+    if (config.dwFillTheSwamp != 0x0)
+    {
+      SetLastError (ERROR_NO_SUCH_DEVICE);
 
-    return INVALID_HANDLE_VALUE;
+      return INVALID_HANDLE_VALUE;
+    }
+
+    else
+    {
+      dwShareMode = (FILE_SHARE_READ | FILE_SHARE_WRITE);
+    }
   }
 
   if (StrStrIW (lpFileName, LR"(\\.\pipe)") != nullptr)
   {
-    SetLastError (ERROR_NO_SUCH_DEVICE);
+    if (config.dwFillTheSwamp != 0x0)
+    {
+      SetLastError (ERROR_NO_SUCH_DEVICE);
 
-    return INVALID_HANDLE_VALUE;
+      return INVALID_HANDLE_VALUE;
+    }
   }
 
   return
@@ -501,100 +534,103 @@ ValvePlug_InitThread (LPVOID)
                           CreateFile2_Detour,
                (void **)(&CreateFile2_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
-                         "XInputGetState",
-                          XInputGetState1_4_Detour,
-               (void **)(&XInputGetState1_4_Original), nullptr );
+    if (config.dwFillTheSwamp != 0x0)
+    {
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
+                           "XInputGetState",
+                            XInputGetState1_4_Detour,
+                 (void **)(&XInputGetState1_4_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
-                          XINPUT_GETSTATEEX_ORDINAL,
-                          XInputGetStateEx1_4_Detour,
-               (void **)(&XInputGetStateEx1_4_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
+                            XINPUT_GETSTATEEX_ORDINAL,
+                            XInputGetStateEx1_4_Detour,
+                 (void **)(&XInputGetStateEx1_4_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
-                         "XInputGetCapabilities",
-                          XInputGetCapabilities1_4_Detour,
-               (void **)(&XInputGetCapabilities1_4_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
+                           "XInputGetCapabilities",
+                            XInputGetCapabilities1_4_Detour,
+                 (void **)(&XInputGetCapabilities1_4_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
-                          XINPUT_GETCAPABILITIES_EX_ORDINAL,
-                          XInputGetCapabilitiesEx1_4_Detour,
-               (void **)(&XInputGetCapabilitiesEx1_4_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_4,
+                            XINPUT_GETCAPABILITIES_EX_ORDINAL,
+                            XInputGetCapabilitiesEx1_4_Detour,
+                 (void **)(&XInputGetCapabilitiesEx1_4_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
-                         "XInputGetState",
-                          XInputGetState1_3_Detour,
-               (void **)(&XInputGetState1_3_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
+                           "XInputGetState",
+                            XInputGetState1_3_Detour,
+                 (void **)(&XInputGetState1_3_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
-                          XINPUT_GETSTATEEX_ORDINAL,
-                          XInputGetStateEx1_3_Detour,
-               (void **)(&XInputGetStateEx1_3_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
+                            XINPUT_GETSTATEEX_ORDINAL,
+                            XInputGetStateEx1_3_Detour,
+                 (void **)(&XInputGetStateEx1_3_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
-                         "XInputGetCapabilities",
-                          XInputGetCapabilities1_3_Detour,
-               (void **)(&XInputGetCapabilities1_3_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
+                           "XInputGetCapabilities",
+                            XInputGetCapabilities1_3_Detour,
+                 (void **)(&XInputGetCapabilities1_3_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
-                          XINPUT_GETCAPABILITIES_EX_ORDINAL,
-                          XInputGetCapabilitiesEx1_3_Detour,
-               (void **)(&XInputGetCapabilitiesEx1_3_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_3,
+                            XINPUT_GETCAPABILITIES_EX_ORDINAL,
+                            XInputGetCapabilitiesEx1_3_Detour,
+                 (void **)(&XInputGetCapabilitiesEx1_3_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
-                         "XInputGetState",
-                          XInputGetState1_2_Detour,
-               (void **)(&XInputGetState1_2_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
+                           "XInputGetState",
+                            XInputGetState1_2_Detour,
+                 (void **)(&XInputGetState1_2_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
-                          XINPUT_GETSTATEEX_ORDINAL,
-                          XInputGetStateEx1_2_Detour,
-               (void **)(&XInputGetStateEx1_2_Original), nullptr );
-    
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
-                         "XInputGetCapabilities",
-                          XInputGetCapabilities1_2_Detour,
-               (void **)(&XInputGetCapabilities1_2_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
+                            XINPUT_GETSTATEEX_ORDINAL,
+                            XInputGetStateEx1_2_Detour,
+                 (void **)(&XInputGetStateEx1_2_Original), nullptr );
+      
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_2,
+                           "XInputGetCapabilities",
+                            XInputGetCapabilities1_2_Detour,
+                 (void **)(&XInputGetCapabilities1_2_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
-                         "XInputGetState",
-                          XInputGetState1_1_Detour,
-               (void **)(&XInputGetState1_1_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
+                           "XInputGetState",
+                            XInputGetState1_1_Detour,
+                 (void **)(&XInputGetState1_1_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
-                          XINPUT_GETSTATEEX_ORDINAL,
-                          XInputGetStateEx1_1_Detour,
-               (void **)(&XInputGetStateEx1_1_Original), nullptr );
-    
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
-                         "XInputGetCapabilities",
-                          XInputGetCapabilities1_1_Detour,
-               (void **)(&XInputGetCapabilities1_1_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
+                            XINPUT_GETSTATEEX_ORDINAL,
+                            XInputGetStateEx1_1_Detour,
+                 (void **)(&XInputGetStateEx1_1_Original), nullptr );
+      
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput1_1,
+                           "XInputGetCapabilities",
+                            XInputGetCapabilities1_1_Detour,
+                 (void **)(&XInputGetCapabilities1_1_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
-                         "XInputGetState",
-                          XInputGetState9_1_0_Detour,
-               (void **)(&XInputGetState9_1_0_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
+                           "XInputGetState",
+                            XInputGetState9_1_0_Detour,
+                 (void **)(&XInputGetState9_1_0_Original), nullptr );
 
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
-                          XINPUT_GETSTATEEX_ORDINAL,
-                          XInputGetStateEx9_1_0_Detour,
-               (void **)(&XInputGetStateEx9_1_0_Original), nullptr );
-    
-    SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
-                         "XInputGetCapabilities",
-                          XInputGetCapabilities9_1_0_Detour,
-               (void **)(&XInputGetCapabilities9_1_0_Original), nullptr );
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
+                            XINPUT_GETSTATEEX_ORDINAL,
+                            XInputGetStateEx9_1_0_Detour,
+                 (void **)(&XInputGetStateEx9_1_0_Original), nullptr );
+      
+      SK_CreateDLLHook2 ( config.wszPathToSystemXInput9_1_0,
+                           "XInputGetCapabilities",
+                            XInputGetCapabilities9_1_0_Detour,
+                 (void **)(&XInputGetCapabilities9_1_0_Original), nullptr );
 
-    SK_CreateDLLHook2 ( L"kernel32.dll",
-                         "GetCommandLineW",
-                          GetCommandLineW_Detour,
-               (void **)(&GetCommandLineW_Original), nullptr );
+      SK_CreateDLLHook2 ( L"kernel32.dll",
+                           "GetCommandLineW",
+                            GetCommandLineW_Detour,
+                 (void **)(&GetCommandLineW_Original), nullptr );
 
-    SK_CreateDLLHook2 ( L"kernel32.dll",
-                         "GetCommandLineA",
-                          GetCommandLineA_Detour,
-               (void **)(&GetCommandLineA_Original), nullptr );
+      SK_CreateDLLHook2 ( L"kernel32.dll",
+                           "GetCommandLineA",
+                            GetCommandLineA_Detour,
+                 (void **)(&GetCommandLineA_Original), nullptr );
+    }
 
     MH_ApplyQueued ();
   }
@@ -654,7 +690,7 @@ DllMain ( HMODULE hModule,
         config.dwFillTheSwamp = false;
       }
 
-      if (config.dwFillTheSwamp != 0x0)
+      //if (config.dwFillTheSwamp != 0x0)
       {
         CloseHandle (
           CreateThread ( nullptr, 0x0, ValvePlug_InitThread,
@@ -672,7 +708,7 @@ DllMain ( HMODULE hModule,
     case DLL_PROCESS_DETACH:
       InterlockedDecrement (&__VP_DLL_Refs);
 
-      if (config.dwFillTheSwamp != 0x0)
+      //if (config.dwFillTheSwamp != 0x0)
       {
         MH_Uninitialize ();
       }
