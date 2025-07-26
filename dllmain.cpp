@@ -1,4 +1,3 @@
-
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
 #include "config.h"
@@ -6,12 +5,6 @@
 #include <string>
 
 #pragma comment (lib, "shlwapi.lib")
-
-#ifdef _M_IX86
-#pragma comment (lib, "SKinHook/libMinHook.lib")
-#else
-#pragma comment (lib, "SKinHook/libMinHook64.lib")
-#endif
 
          config_s config;
 volatile LONG     __VP_DLL_Refs = 0UL;
@@ -199,11 +192,6 @@ SK_CreateDLLHook2 ( const wchar_t  *pwszModule, const char  *pszProcName,
     {
       if (ppOriginal == nullptr)
       {
-        SH_Introspect ( pFuncAddr,
-                          SH_TRAMPOLINE,
-                            ppOriginal );
-
-        return status;
       }
 
       else if (MH_OK == (status = MH_RemoveHook (pFuncAddr)))
@@ -225,60 +213,6 @@ SK_CreateDLLHook2 ( const wchar_t  *pwszModule, const char  *pszProcName,
   }
 
   return status;
-}
-
-
-typedef _Return_type_success_(return >= 0) LONG NTSTATUS;
-typedef NTSTATUS *PNTSTATUS;
-
-using LdrLockLoaderLock_pfn   = NTSTATUS (WINAPI *)(ULONG Flags, ULONG *State, ULONG_PTR *Cookie);
-using LdrUnlockLoaderLock_pfn = NTSTATUS (WINAPI *)(ULONG Flags,               ULONG_PTR  Cookie);
-
-extern "C"
-NTSTATUS
-WINAPI
-SK_NtLdr_LockLoaderLock (ULONG Flags, ULONG* State, ULONG_PTR* Cookie)
-{
-  //// The lock must not be acquired until DllMain (...) returns!
-  //if (ReadAcquire (&__VP_DLL_Refs) < 1)
-  //  return STATUS_SUCCESS; // No-Op
-
-  static LdrLockLoaderLock_pfn LdrLockLoaderLock =
-        (LdrLockLoaderLock_pfn)GetProcAddress (GetModuleHandleW (L"NtDll.dll"),
-        "LdrLockLoaderLock");
-
-  if (! LdrLockLoaderLock)
-    return ERROR_NOT_FOUND;
-
-  return
-    LdrLockLoaderLock (Flags, State, Cookie);
-}
-
-extern "C"
-NTSTATUS
-WINAPI
-SK_NtLdr_UnlockLoaderLock (ULONG Flags, ULONG_PTR Cookie)
-{
-  static LdrUnlockLoaderLock_pfn LdrUnlockLoaderLock =
-        (LdrUnlockLoaderLock_pfn)GetProcAddress (GetModuleHandleW (L"NtDll.dll"),
-        "LdrUnlockLoaderLock");
-
-  if (! LdrUnlockLoaderLock)
-    return ERROR_NOT_FOUND;
-
-  NTSTATUS UnlockLoaderStatus =
-    LdrUnlockLoaderLock (Flags, Cookie);
-
-//  // Check for Loader Unlock Failure...
-//  if (ReadAcquire (&__VP_DLL_Refs) >= 1 && Cookie != 0)
-//  {
-//#ifdef DEBUG
-//    assert (UnlockLoaderStatus == STATUS_SUCCESS);
-//#endif
-//  }
-
-  return
-    UnlockLoaderStatus;
 }
 
 static XInputGetState_pfn          XInputGetState1_4_Original          = nullptr;
