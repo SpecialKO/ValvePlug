@@ -680,10 +680,10 @@ ValvePlug_InitThread (LPVOID)
                             SDL_InitSubSystem_Detour,
                   (void**)(&SDL_InitSubSystem_Original), nullptr );
 
-      DisableSDLInput ( );
+      DisableSDLInput ();
     }
 
-        MH_ApplyQueued ();
+    MH_ApplyQueued ();
   }
 
   return 0;
