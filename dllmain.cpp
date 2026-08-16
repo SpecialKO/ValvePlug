@@ -513,6 +513,50 @@ XInputGetCapabilities9_1_0_Detour (
 }
 
 
+using  SDL_InitSubSystem_pfn = bool (*)(uint32_t flags);
+static SDL_InitSubSystem_pfn SDL_InitSubSystem_Original = nullptr;
+
+#define SDL3_INIT_JOYSTICK   0x00000200U
+#define SDL3_INIT_GAMEPAD    0x00002000U
+
+bool SDL_InitSubSystem_Detour (uint32_t flags)
+{
+    if (config.dwFillTheSwamp != 0x0)
+    {
+        // Only interrupt input relater init
+        if ((flags & SDL3_INIT_JOYSTICK) || (flags & SDL3_INIT_GAMEPAD))
+        {
+            // Remove Gamepad and Joystick flags
+            flags &= ~SDL3_INIT_JOYSTICK;
+            flags &= ~SDL3_INIT_GAMEPAD;
+
+            // return fake true for input
+            if (flags == 0) return true;
+        }
+    }
+    return SDL_InitSubSystem_Original(flags);
+}
+
+void DisableSDLInput () 
+{
+    // Usually, by the time Steam loads XInput, SDL is already initialized.
+    // In this case, we need to explicitly shut down its active input subsystems.
+    if (SDL_InitSubSystem_Original != nullptr)
+    {
+        using SDL_QuitSubSystem_pfn = void (*)(uint32_t flags);
+        auto  SDL_QuitSubSystem_Func = (SDL_QuitSubSystem_pfn)GetProcAddress(GetModuleHandleW(L"SDL3.dll"), "SDL_QuitSubSystem");
+
+        if (SDL_QuitSubSystem_Func != nullptr)
+        {
+            SDL_QuitSubSystem_Func (SDL3_INIT_GAMEPAD); 
+            SDL_QuitSubSystem_Func (SDL3_INIT_JOYSTICK); // this will cause XInput unload
+
+            //Docs also say to call SDL_Quit() after, but that's excessive
+            //And can cause steam to crash when it tries to call SDL
+        }
+    }
+}
+
 DWORD
 WINAPI
 ValvePlug_InitThread (LPVOID)
@@ -630,6 +674,13 @@ ValvePlug_InitThread (LPVOID)
                            "GetCommandLineA",
                             GetCommandLineA_Detour,
                  (void **)(&GetCommandLineA_Original), nullptr );
+
+      SK_CreateDLLHook2 ( L"SDL3.dll",
+                           "SDL_InitSubSystem",
+                            SDL_InitSubSystem_Detour,
+                  (void**)(&SDL_InitSubSystem_Original), nullptr );
+
+      DisableSDLInput ();
     }
 
     MH_ApplyQueued ();
@@ -648,6 +699,13 @@ DllMain ( HMODULE hModule,
   {
     case DLL_PROCESS_ATTACH:
     {
+        // SDL will try to unload XInput
+        // Set PIN to prevent that
+        HMODULE hSelf = nullptr;
+        GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
+                  (LPCWSTR)&DllMain,
+                           &hSelf);
+
       InterlockedIncrement (&__VP_DLL_Refs);
 
       config = { };
